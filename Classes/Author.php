@@ -117,5 +117,35 @@ public function setAuthorEmail(string $newAuthorEmail): void {
 $this->authorEmail = $newAuthorEmail;
 	}
 	/**
-	 * access method for
+	 * access method for Author hash password
+	 *
+	 * @param string $newAuthorHash
+	 * @throws \InvalidArgumentException if the has is not secure
+	 * @throws \RangeException if the has is not 128 characters
+	 * @throws \TypeError if profile hash is not a string
 	 */
+	public function setAuthorHash(string $newAuthorHash): void {
+	//enforce that the has is properly formatted
+	$newAuthorHash = trim($newAuthorHash);
+	if(empty($newAuthorHash) === true) {
+		throw(new \InvalidArgumentException("profile password hash is empty or insecure"));
+	}
+	//enforce hash is really an Argon hash
+	$authorHashInfo = password_get_info($newAuthorHash);
+	if($newAuthorHash["algoName"] !== "argon2i") {
+		throw(new \InvalidArgumentException("profile is not a valid hash"));
+	}
+	//enforce that the has is exactly 97 characters.
+	if(strlen($newAuthorHash) !== 97) {
+		throw(new \RangeException("profile hash must be 97 characters"));
+	}
+	//store the hash
+	$this->AuthorHash = $newAuthorHash;
+	}
+	/**
+	 * mutator method for username
+	 *
+	 *@param string $newAuthorUserName new value of username
+	 *@throw
+	 */
+}
