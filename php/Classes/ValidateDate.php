@@ -1,5 +1,5 @@
 <?php
-namespace Zachary22-Sanchez\object-oriented-project;
+namespace Zachary22Sanchez\ObjectOrientedProject;
 /**
  * Trait to Validate a mySQL Date
  *
@@ -22,7 +22,7 @@ trait ValidateDate {
 	 * @throws \RangeException if the date is not a Gregorian date
 	 * @throws \TypeError when type hints fail
 	 **/
-	private static function validateDate($newDate) : \DateTime {
+	private static function validateDate($newDateTime) : \DateTime {
 		// base case: if the date is a DateTime object, there's no work to be done
 		if(is_object($newDate) === true && get_class($newDate) === "DateTime") {
 			return ($newDate);
