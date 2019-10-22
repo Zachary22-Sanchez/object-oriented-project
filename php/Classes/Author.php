@@ -6,7 +6,7 @@ require_once(dirname(__DIR__, 1) ."/vendor/autoload.php");
 use Ramsey\Uuid\Uuid;
 
 class Author {
-	use ValidateUuid;
+use ValidateUuid;
 	/**
 	 * id for this Profile; this is the primary key
 	 * @var Uuid $profileId
@@ -75,117 +75,125 @@ class Author {
 	public function getAuthorId(): Uuid {
 		return ($this->authorId);
 	}
-/**
- * mutator method for author id
- *
- * @param Uuid| string $newAuthorId value of new author id
- * @throws \RangeException if $newAuthorId is not positive
- * @throws \TypeError if the profile Id is not
- */
-public function setAuthorId( $newAuthorId): void {
-	try {
-		$uuid = self::validateUuid($newAuthorId);
-	} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
-		$exceptionType = get_class($exception);
-		throw(new $exceptionType($exception->getMessage(), 0, $exception));
+
+	/**
+	 * mutator method for author id
+	 *
+	 * @param Uuid| string $newAuthorId value of new author id
+	 * @throws \RangeException if $newAuthorId is not positive
+	 * @throws \TypeError if the profile Id is not
+	 */
+	public function setAuthorId($newAuthorId): void {
+		try {
+			$uuid = self::validateUuid($newAuthorId);
+		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+			$exceptionType = get_class($exception);
+			throw(new $exceptionType($exception->getMessage(), 0, $exception));
+		}
+		//convert and store the author id
+		$this->authorId = $uuid;
 	}
-	//convert and store the author id
-	$this->authorId = $uuid;
-}
-/**
- * accessor method for author account activation token
- *
- * @return string value of the author activation token
- */
-public function getAuthorActivationToken() : ?string {
-	return ($this->authorActivationToken);
-}
-/**
- *mutator method for account activation token
- *
- *@param string $newAuthorActivationToken
- *@throws \InvalidArgumentException if the token is not a string or insecure
- *@throws \RangeException if the token is not exactly 32 characters
- *@throws \TypeError if the activation token is not a string
- */
-public function setAuthorActivationToken(?string $newAuthorActivationToken): void {
-	if($newAuthorActivationToken === null) {
-		$this->authorActivationToken = null;
-		return;
+
+	/**
+	 * accessor method for author account activation token
+	 *
+	 * @return string value of the author activation token
+	 */
+	public function getAuthorActivationToken(): ?string {
+		return ($this->authorActivationToken);
 	}
-	$newAuthorActivationToken = strtolower(trim($newAuthorActivationToken));
-	if(ctype_xdigit($newAuthorActivationToken) === false) {
-		throw(new\RangeException("user activation is not valid"));
+
+	/**
+	 *mutator method for account activation token
+	 *
+	 * @param string $newAuthorActivationToken
+	 * @throws \InvalidArgumentException if the token is not a string or insecure
+	 * @throws \RangeException if the token is not exactly 32 characters
+	 * @throws \TypeError if the activation token is not a string
+	 */
+	public function setAuthorActivationToken(?string $newAuthorActivationToken): void {
+		if($newAuthorActivationToken === null) {
+			$this->authorActivationToken = null;
+			return;
+		}
+		$newAuthorActivationToken = strtolower(trim($newAuthorActivationToken));
+		if(ctype_xdigit($newAuthorActivationToken) === false) {
+			throw(new\RangeException("user activation is not valid"));
+		}
+		//make sure user activation token is only 32 characters
+		if(strlen($newAuthorActivationToken) !== 32) {
+			throw(new\RangeException("user activation token has to be 32"));
+		}
+		$this->authorActivationToken = $newAuthorActivationToken;
 	}
-	//make sure user activation token is only 32 characters
-	if(strlen($newAuthorActivationToken) !== 32) {
-		throw(new\RangeException("user activation token has to be 32"));
+
+	/**
+	 * accessor method for at handle
+	 *
+	 * @return string value of at handle
+	 */
+	public function getAuthorAvatarUrl(): ?string {
+		return ($this->authorAvatarUrl);
 	}
-	$this->authorActivationToken = $newAuthorActivationToken;
-}
-/**
- * accessor method for at handle
- *
- * @return string value of at handle
- */
-public function getAuthorAvatarUrl(): ?string {
-	return ($this->authorAvatarUrl);
-}
-/**
- *mutator method for at handle
- *
- *@param string $newAuthorAvatarUrl new value of at handle
- *@throws \InvalidArgumentException if $newAtHandle is not a string or insecure
- *@throws \RangeException if $newAtHandle is > 32 characters
- *@throws \TypeError if $newAtHandle is not a string
- */
-public function setAuthorAvatarUrl(?string $newAuthorAvatarUrl) : void {
-	if($newAuthorAvatarUrl === null) {
-		$this->getAuthorAvatarUrl = null;
-		return;
+
+	/**
+	 *mutator method for at handle
+	 *
+	 * @param string $newAuthorAvatarUrl new value of at handle
+	 * @throws \InvalidArgumentException if $newAtHandle is not a string or insecure
+	 * @throws \RangeException if $newAtHandle is > 32 characters
+	 * @throws \TypeError if $newAtHandle is not a string
+	 */
+	public function setAuthorAvatarUrl(?string $newAuthorAvatarUrl): void {
+		if($newAuthorAvatarUrl === null) {
+			$this->getAuthorAvatarUrl = null;
+			return;
+		}
+		//verify the at handle is secure
+		$newAuthorAvatarUrl = trim($newAuthorAvatarUrl);
+		$newAuthorAvatarUrl = filter_var($newAuthorAvatarUrl, FILTER_VALIDATE_URL,);
+		if($newAuthorAvatarUrl === false) {
+			throw(new \InvalidArgumentException("author url is empty or insecure"));
+		}
+		if(strlen($newAuthorAvatarUrl) > 255) {
+			throw(new \RangeException("avatar is too large"));
+		}
+		// store  the at handle
+		$this->authorAvatarUrl = $newAuthorAvatarUrl;
 	}
-	//verify the at handle is secure
-	$newAuthorAvatarUrl = trim($newAuthorAvatarUrl);
-	$newAuthorAvatarUrl = filter_var($newAuthorAvatarUrl, FILTER_VALIDATE_URL, );
-	if($newAuthorAvatarUrl === false) {
-		throw(new \InvalidArgumentException("author url is empty or insecure"));
-	}
-	if(strlen($newAuthorAvatarUrl) > 255) {
-		throw(new \RangeException("avatar is too large"));
-	}
-	// store  the at handle
-	$this->authorAvatarUrl = $newAuthorAvatarUrl;
-}
+
 	/**
 	 * accessor method for email
 	 *
 	 * @return string value of email
 	 */
 	public function getAuthorEmail(): string {
-				return $this->authorEmail;
+		return $this->authorEmail;
 	}
-/**
- * mutator method for email
- *
- * @param string $newAuthorEmail new value of email
- * @throws \InvalidArgumentException if $newEmail is not valid email or insecure
- * @throws \RangeException if $newEmail is > 128 characters
- * @throws \TypeError if $newEmail is not a string
- */
-public function setAuthorEmail(string $newAuthorEmail): void {
-	//verify the email is secure
-	$newAuthorEmail = trim($newAuthorEmail);
-	$newAuthorEmail = filter_var($newAuthorEmail, FILTER_VALIDATE_EMAIL);
-	if(empty($newAuthorEmail) === true) {
-		throw(new \InvalidArgumentException("profile email is empty or insecure"));
-	}
-	//verify the email will fit in the database
-	if(strlen($newAuthorEmail) > 128) {
-		throw(new \RangeException("profile email is too large"));
-	}
+
+	/**
+	 * mutator method for email
+	 *
+	 * @param string $newAuthorEmail new value of email
+	 * @throws \InvalidArgumentException if $newEmail is not valid email or insecure
+	 * @throws \RangeException if $newEmail is > 128 characters
+	 * @throws \TypeError if $newEmail is not a string
+	 */
+	public function setAuthorEmail(string $newAuthorEmail): void {
+		//verify the email is secure
+		$newAuthorEmail = trim($newAuthorEmail);
+		$newAuthorEmail = filter_var($newAuthorEmail, FILTER_VALIDATE_EMAIL);
+		if(empty($newAuthorEmail) === true) {
+			throw(new \InvalidArgumentException("profile email is empty or insecure"));
+		}
+		//verify the email will fit in the database
+		if(strlen($newAuthorEmail) > 128) {
+			throw(new \RangeException("profile email is too large"));
+		}
 //store the email
-	$this->authorEmail = $newAuthorEmail;
-}
+		$this->authorEmail = $newAuthorEmail;
+	}
+
 	/**
 	 * accessor method for authorHash
 	 *
@@ -194,6 +202,7 @@ public function setAuthorEmail(string $newAuthorEmail): void {
 	public function getAuthorHash(): string {
 		return $this->authorHash;
 	}
+
 	/**
 	 * mutator method for author hash password
 	 *
@@ -203,34 +212,35 @@ public function setAuthorEmail(string $newAuthorEmail): void {
 	 * @throws \TypeError if profile hash is not a string
 	 */
 	public function setAuthorHash(string $newAuthorHash): void {
-	//enforce that the has is properly formatted
-	$newAuthorHash = trim($newAuthorHash);
-	$newAuthorHash = strtolower($newAuthorHash);
-	if(empty($newAuthorHash) === true) {
-		throw(new \InvalidArgumentException("author password hash is empty or insecure"));
-	}
-	//enforce hash is really an Argon hash
-	if(!ctype_xdigit($newAuthorHash)) {
-		throw(new \InvalidArgumentException("author password hash is empty or insecure"));
-	}
-	//enforce that the has is exactly 97 characters.
-	if(strlen($newAuthorHash) !== 97) {
-		throw(new \RangeException("author hash must be 97 characters"));
-	}
-	//store the hash
-	$this->authorHash = $newAuthorHash;
+		//enforce that the has is properly formatted
+		$newAuthorHash = trim($newAuthorHash);
+		$newAuthorHash = strtolower($newAuthorHash);
+		if(empty($newAuthorHash) === true) {
+			throw(new \InvalidArgumentException("author password hash is empty or insecure"));
+		}
+		//enforce hash is really an Argon hash
+		if(!ctype_xdigit($newAuthorHash)) {
+			throw(new \InvalidArgumentException("author password hash is empty or insecure"));
+		}
+		//enforce that the has is exactly 97 characters.
+		if(strlen($newAuthorHash) !== 97) {
+			throw(new \RangeException("author hash must be 97 characters"));
+		}
+		//store the hash
+		$this->authorHash = $newAuthorHash;
 	}
 
 	public function getAuthorUsername(): string {
 		return $this->authorUsername;
 	}
+
 	/**
 	 * mutator method for author username
 	 *
-	 *@param string $newAuthorUsername new value of username
-	 *@throw \InvalidArgumentException if $newUsername is not a string or insecure
-	 *@throw \RangeException if $newUserName is > 32 characters
-	 *@throws \TypeError if $newUserName is not a string
+	 * @param string $newAuthorUsername new value of username
+	 * @throw \InvalidArgumentException if $newUsername is not a string or insecure
+	 * @throw \RangeException if $newUserName is > 32 characters
+	 * @throws \TypeError if $newUserName is not a string
 	 */
 	public function setAuthorUsername(string $newAuthorUsername): void {
 		//verify the username is secure
@@ -242,6 +252,7 @@ public function setAuthorEmail(string $newAuthorEmail): void {
 		//store the hash
 		$this->authorUsername = $newAuthorUsername;
 	}
+
 	/**
 	 * formats the state variables for JSON serialization
 	 *
@@ -249,9 +260,126 @@ public function setAuthorEmail(string $newAuthorEmail): void {
 	 **/
 	public function jsonSerialize() {
 		$fields = get_object_vars($this);
-		$fields["profileId"] = $this->authorId->toString();
+		$fields["authorId"] = $this->authorId->toString();
 		unset($fields["authorHash"]);
 		return ($fields);
 	}
-}
 
+	/**
+	 * inserts this Author into mySQL
+	 *
+	 * @param \PDO $pdo PDO connection object
+	 * @throws \PDOException when mySQL related error occur
+	 * @throws \TypeError if $pdo is not a PDO connection object
+	 */
+	public function insert(\PDO $pdo): void {
+
+		//create query template
+		$query = "INSERT INTO author(authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername)
+VALUES (:authorId, :authorActivationToken, :authorAvatarUrl, :authorEmail, :authorHash, :authorUsername)";
+		$statement = $pdo->prepare($query);
+	}
+
+	/**
+	 * deletes this author from mySQL
+	 *
+	 * @param \PDO $pdo PDO connection object
+	 * @throws \PDOException when mySQL related errors occur
+	 * @throws \TypeError if $pdo is not a PDO connection object
+	 */
+	public function delete(\PDO $pdo): void {
+
+		//create query template
+		$query = "DELETE FROM author WHERE authorId = :authorId";
+		$statement = $pdo->prepare($query);
+
+		//bind the member variables to the place holder in the template
+		$parameters = ["authorId" => $this->authorId->getBytes()];
+		$statement->execute($parameters);
+	}
+
+	/**
+	 * updates this Author in mySQL
+	 *
+	 * @param \PDO $pdo PDO connection object
+	 * @throws \PDOException when mySQL related errors occur
+	 * @throws \TypeError if $pdo is not a PDO connection object
+	 */
+	public function update(\PDO $pdo): void {
+
+		//create query template
+		$query = "UPDATE author SET authorId = :authorId, authorActivationToken = :authorActivationToken, authorAvatarUrl = :authorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsername = :authorUsername";
+		$statement = $pdo->prepare($query);
+
+		$parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken->getBytes(), "authorAvatarUrl" => $this->authorAvatarUrl->getBytes(), "authorEmail" => $this->authorEmail->getBytes(), "authorHash" => $this->authorHash->getBytes(), "authorUsername" => $this->authorUsername->getBytes()];
+		$statement->execute($parameters);
+	}
+
+	public static function getAuthorByAuthorId(\PDO $pdo, $authorId): ?Author {
+		//sanitize the authorId before searching
+		try {
+			$authorId = self::validateUuid($authorId);
+		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+			throw(new \PDOException($exception->getMessage(), 0, $exception));
+		}
+		//Possibly something wrong below
+		//create query template
+		$query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername";
+		$statement = $pdo->prepare($query);
+
+		//bind the author id to the place holder in the template
+		$parameters = ["authorId" => $authorId->getBytes()];
+		$statement->execute($parameters);
+
+		//grab the author from mySQL
+		try {
+			$author = null;
+			$statement->setFetchMode(\PDO::FETCH_ASSOC);
+			$row = $statement->fetch();
+			if($row !== false) {
+				$author = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+			}
+	} catch(\Exception $exception) {
+		// if the row couldn't be converted, rethrow it
+			throw(new \PDOException($exception->getMessage(), 0, $exception));
+		}
+		return($author);
+	}
+		/**
+		 * gets the Author by author id
+		 *
+		 * @param \PDO $pdo PDO connection object
+		 * @param Uuid|string $authorId author id search by
+		 * @param \SplFixedArray SplFixedArray of Authors found
+		 * @throws \PDOException when mySQL related errors occur
+		 * @throws \TypeError when variables are not the correct data type
+		 */
+		public static function getAuthorsByAuthorId(\PDO $pdo, $authorId) : ?Author {
+			try {
+				$authorId == self::validateUuid($authorId);
+			} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+				throw(new \PDOException($exception->getMessage(), 0, $exception));
+			}
+			// create query template
+			$query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername";
+			$statement = $pdo->prepare($query);
+
+			//bind the tweet id to the place holder in the template
+			$parameters = ["authorId" => $authorId->getBytes()];
+			$statement->execute($parameters);
+
+			// grab the author from mySQL
+			try {
+					$author = null;
+					$statement->setFetchMode(\PDO::FETCH_ASSOC);
+					$row = $statement->fetch();
+					if($row !== false) {
+						$author = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+					}
+			} catch(\Exception $exception) {
+				// if the row couldn't be converted, rethrow it
+				throw(new \PDOException($exception->getMessage(), 0, $exception));
+			}
+			return($author);
+		}
+}
